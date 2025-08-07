@@ -1,28 +1,27 @@
-{
-  "name": "rtyrtyhfg",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vitejs/plugin-react": "^4.0.3",
-    "eslint": "^8.45.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.3",
-    "typescript": "^5.0.2",
-    "vite": "^4.4.5"
-  }
-}
+```typescript
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+// This import will cause the test to fail initially because the 'App.tsx' component
+// (a typical main application component in a Vite React project) does not yet exist.
+import App from './App';
+
+describe('Project Initialization Verification', () => {
+  it('should render the default Vite + React welcome message after initialization', () => {
+    // This `render` call will fail because the `App` component file is not yet created.
+    // If `App.tsx` were to exist but be empty or contain different content,
+    // the subsequent `getByRole` assertion would also fail, ensuring initial failure.
+    render(<App />);
+
+    // This assertion looks for the common "Vite + React" heading, which is typically present
+    // in the default setup of a new Vite React project. Verifying its presence indicates
+    // that the core project, including React and Vite, has been successfully initialized.
+    // The test is designed to fail initially because the component doesn't exist or
+    // doesn't yet contain this specific, expected content.
+    const viteReactHeading = screen.getByRole('heading', {
+      name: /Vite \+ React/i,
+      level: 1,
+    });
+
+    expect(viteReactHeading).toBeInTheDocument();
+  });
+});
