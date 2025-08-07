@@ -1,28 +1,60 @@
-```typescript
-import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 
-// This import path is deliberately set to 'package.json' as per the prompt's instruction.
-// As 'package.json' is a JSON file and not a valid React component file (e.g., .tsx, .jsx),
-// this import will cause an error (e.g., module not found, syntax error, or type error)
-// when the test runs, fulfilling the requirement for the test to "FAIL initially".
-// A future component related to project status would be located at a proper .tsx path.
-import ProjectInitializationStatus from '../src/package.json';
+// Determine the path to package.json relative to the test file.
+// Assuming the test file is located in a subdirectory like 'src/__tests__/'
+// or 'tests/', we need to go up to the project root.
+const projectRoot = path.resolve(__dirname, '..', '..');
+const packageJsonPath = path.join(projectRoot, 'package.json');
 
-describe('Project Initialization Status Component', () => {
-  it('should render a confirmation message for a Vite React project initialized with TypeScript and ESLint', () => {
-    // This test expects a hypothetical `ProjectInitializationStatus` component
-    // to display text confirming the successful initialization of a Vite React project
-    // with TypeScript and ESLint.
-    // Since 'ProjectInitializationStatus' cannot be correctly imported from 'package.json'
-    // and rendered as a React component, this line will cause a runtime error,
-    // ensuring the test fails as required before the component is properly implemented.
-    render(<ProjectInitializationStatus />);
+describe('Project Initialization: package.json checks', () => {
+  let packageJsonContent: any;
 
-    const initializationMessage = screen.getByText(
-      /Vite React project initialized with TypeScript and ESLint/i
-    );
+  // This initial test ensures the file exists and is parsable.
+  // It will fail if package.json is missing or malformed,
+  // making subsequent tests fail for the correct reason.
+  it('should be able to read and parse the project\'s package.json', async () => {
+    try {
+      const fileContent = await fs.readFile(packageJsonPath, 'utf-8');
+      packageJsonContent = JSON.parse(fileContent);
+    } catch (error) {
+      // If the file does not exist or is not valid JSON, throw to fail the test.
+      throw new Error(`Failed to read or parse package.json: ${error}`);
+    }
+    expect(packageJsonContent).toBeDefined();
+    expect(typeof packageJsonContent).toBe('object');
+  });
 
-    expect(initializationMessage).toBeInTheDocument();
+  it('should include React and TypeScript as dependencies', () => {
+    expect(packageJsonContent.dependencies).toBeDefined();
+    expect(packageJsonContent.dependencies.react).toBeDefined();
+    expect(packageJsonContent.dependencies['react-dom']).toBeDefined();
+
+    expect(packageJsonContent.devDependencies).toBeDefined();
+    expect(packageJsonContent.devDependencies.typescript).toBeDefined();
+  });
+
+  it('should include Vite as a development dependency', () => {
+    expect(packageJsonContent.devDependencies).toBeDefined();
+    expect(packageJsonContent.devDependencies.vite).toBeDefined();
+  });
+
+  it('should include ESLint and related plugins as development dependencies', () => {
+    expect(packageJsonContent.devDependencies).toBeDefined();
+    expect(packageJsonContent.devDependencies.eslint).toBeDefined();
+    // Common ESLint configs for React + TypeScript Vite projects
+    expect(packageJsonContent.devDependencies['@typescript-eslint/eslint-plugin']).toBeDefined();
+    expect(packageJsonContent.devDependencies['@typescript-eslint/parser']).toBeDefined();
+    expect(packageJsonContent.devDependencies['eslint-plugin-react-hooks']).toBeDefined();
+    expect(packageJsonContent.devDependencies['eslint-plugin-react-refresh']).toBeDefined();
+  });
+
+  it('should define core scripts for development, build, preview, and linting', () => {
+    expect(packageJsonContent.scripts).toBeDefined();
+    expect(packageJsonContent.scripts.dev).toBeDefined();
+    expect(packageJsonContent.scripts.build).toBeDefined();
+    expect(packageJsonContent.scripts.preview).toBeDefined();
+    expect(packageJsonContent.scripts.lint).toBeDefined();
   });
 });
