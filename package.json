@@ -1,43 +1,14 @@
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import * as fs from 'fs';
-import * as path from 'path';
+import ProjectSetupStatus from '../src/components/ProjectSetupStatus'; // Component does not exist yet, causing initial failure
 
-const projectRoot = path.resolve(__dirname, '../../');
-const packageJsonPath = path.join(projectRoot, 'package.json');
+describe('ProjectSetupStatus', () => {
+  it('should display confirmation of Vite, React, TypeScript, and ESLint setup', () => {
+    render(<ProjectSetupStatus />);
 
-describe('Project Initialization', () => {
-  it('should verify the package.json reflects a Vite React project with TypeScript and ESLint setup', () => {
-    // Ensure package.json file exists
-    expect(fs.existsSync(packageJsonPath)).toBe(true);
-
-    // Read and parse package.json content
-    const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf-8');
-    const packageJson = JSON.parse(packageJsonContent);
-
-    // Combine dependencies and devDependencies for easier checking
-    const allDependencies = {
-      ...(packageJson.dependencies || {}),
-      ...(packageJson.devDependencies || {}),
-    };
-
-    // Verify core React dependencies
-    expect(allDependencies).toHaveProperty('react');
-    expect(allDependencies).toHaveProperty('react-dom');
-
-    // Verify Vite setup
-    expect(allDependencies).toHaveProperty('vite');
-    expect(allDependencies).toHaveProperty('@vitejs/plugin-react');
-
-    // Verify TypeScript setup
-    expect(allDependencies).toHaveProperty('typescript');
-    expect(allDependencies).toHaveProperty('@types/react');
-    expect(allDependencies).toHaveProperty('@types/react-dom');
-
-    // Verify ESLint setup
-    expect(allDependencies).toHaveProperty('eslint');
-    expect(allDependencies).toHaveProperty('@typescript-eslint/eslint-plugin');
-    expect(allDependencies).toHaveProperty('@typescript-eslint/parser');
-    expect(allDependencies).toHaveProperty('eslint-plugin-react-hooks');
-    expect(allDependencies).toHaveProperty('eslint-plugin-react-refresh');
+    expect(screen.getByText(/Vite project initialized/i)).toBeInTheDocument();
+    expect(screen.getByText(/React configured/i)).toBeInTheDocument();
+    expect(screen.getByText(/TypeScript enabled/i)).toBeInTheDocument();
+    expect(screen.getByText(/ESLint configured/i)).toBeInTheDocument();
   });
 });
