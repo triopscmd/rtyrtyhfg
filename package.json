@@ -1,0 +1,15 @@
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import App from '../src/App';
+
+describe('App component', () => {
+  it('renders the default Vite + React welcome message indicating successful project initialization', () => {
+    // This test is designed to fail initially because the `App` component
+    // (or '../src/App.tsx' file) is expected not to exist yet,
+    // or not to export a default `App` component as required.
+    // Once the project is initialized and App.tsx is created with the
+    // default Vite + React setup, this test should pass.
+    render(<App />);
+    expect(screen.getByText(/Vite \+ React/i)).toBeInTheDocument();
+  });
+});
