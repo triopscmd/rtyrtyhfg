@@ -1,17 +1,36 @@
-import { render, screen } from '@testing-library/react';
+// package.json.test.tsx
 import { describe, it, expect } from 'vitest';
-import PackageJson from '../src/components/PackageJson'; // This import will fail initially as src/components/PackageJson.tsx does not exist.
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
-describe('PackageJson Component', () => {
-  it('should indicate that the Vite React project is initialized with TypeScript and ESLint', () => {
-    // The component `PackageJson` is expected to verify and display the project initialization status.
-    // This render call will fail initially because src/components/PackageJson.tsx does not exist.
-    // If it existed, it would likely fail because the component does not yet implement the verification logic
-    // or does not output the specific expected text.
-    render(<PackageJson />);
+// This import will cause the test to fail initially because 'ProjectSetupReport.tsx'
+// (which would conceptually parse and display information from package.json) does not exist yet.
+// It acts as the "new component" that verifies the project initialization.
+import ProjectSetupReport from '../src/components/ProjectSetupReport';
 
-    // This assertion expects a specific text confirming the successful initialization.
-    // It will fail because the component is not yet rendering this text.
-    expect(screen.getByText(/Vite React project successfully initialized with TypeScript and ESLint/i)).toBeInTheDocument();
+describe('Project Setup Verification via ProjectSetupReport Component', () => {
+  it('should render correct status indicating a Vite React project with TypeScript and ESLint setup', () => {
+    // Render the hypothetical ProjectSetupReport component.
+    // This component, once implemented, would read `package.json`
+    // and render UI elements confirming the setup.
+    render(<ProjectSetupReport />);
+
+    // Assert that key indicators for Vite, React, TypeScript, and ESLint are present.
+    // These strings would be rendered by `ProjectSetupReport` if the `package.json`
+    // reflects a successful setup.
+    expect(screen.getByText(/Vite setup: OK/i)).toBeInTheDocument();
+    expect(screen.getByText(/React configured: Yes/i)).toBeInTheDocument();
+    expect(screen.getByText(/TypeScript support: Enabled/i)).toBeInTheDocument();
+    expect(screen.getByText(/ESLint integration: Active/i)).toBeInTheDocument();
+
+    // Optionally, verify specific package names or scripts if the component detailed them.
+    // For example, if ProjectSetupReport listed main dev dependencies:
+    expect(screen.getByText(/Dependency: vite/i)).toBeInTheDocument();
+    expect(screen.getByText(/Dependency: @types\/react/i)).toBeInTheDocument();
+    expect(screen.getByText(/Dependency: typescript/i)).toBeInTheDocument();
+    expect(screen.getByText(/Dependency: eslint/i)).toBeInTheDocument();
+    expect(screen.getByText(/Script: dev/i)).toBeInTheDocument();
+    expect(screen.getByText(/Script: build/i)).toBeInTheDocument();
+    expect(screen.getByText(/Script: lint/i)).toBeInTheDocument();
   });
 });
