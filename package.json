@@ -1,60 +1,56 @@
 import { describe, it, expect } from 'vitest';
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
+import fs from 'node:fs';
+import path from 'node:path';
 
-// Determine the path to package.json relative to the test file.
-// Assuming the test file is located in a subdirectory like 'src/__tests__/'
-// or 'tests/', we need to go up to the project root.
-const projectRoot = path.resolve(__dirname, '..', '..');
-const packageJsonPath = path.join(projectRoot, 'package.json');
+describe('Project Initialization Check', () => {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
 
-describe('Project Initialization: package.json checks', () => {
-  let packageJsonContent: any;
+  it('should have a properly initialized Vite React project with TypeScript and ESLint setup in package.json', () => {
+    // Ensure package.json file exists and is readable
+    expect(() => fs.readFileSync(packageJsonPath, 'utf-8')).not.toThrow(
+      'package.json file not found or not readable. Ensure it exists at the project root.',
+    );
 
-  // This initial test ensures the file exists and is parsable.
-  // It will fail if package.json is missing or malformed,
-  // making subsequent tests fail for the correct reason.
-  it('should be able to read and parse the project\'s package.json', async () => {
-    try {
-      const fileContent = await fs.readFile(packageJsonPath, 'utf-8');
-      packageJsonContent = JSON.parse(fileContent);
-    } catch (error) {
-      // If the file does not exist or is not valid JSON, throw to fail the test.
-      throw new Error(`Failed to read or parse package.json: ${error}`);
-    }
-    expect(packageJsonContent).toBeDefined();
-    expect(typeof packageJsonContent).toBe('object');
-  });
+    const packageJsonContent = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
-  it('should include React and TypeScript as dependencies', () => {
+    // Verify presence of 'dependencies' and 'devDependencies' sections
     expect(packageJsonContent.dependencies).toBeDefined();
+    expect(typeof packageJsonContent.dependencies).toBe('object');
+    expect(packageJsonContent.devDependencies).toBeDefined();
+    expect(typeof packageJsonContent.devDependencies).toBe('object');
+    expect(packageJsonContent.scripts).toBeDefined();
+    expect(typeof packageJsonContent.scripts).toBe('object');
+
+    // Verify core React dependencies
     expect(packageJsonContent.dependencies.react).toBeDefined();
     expect(packageJsonContent.dependencies['react-dom']).toBeDefined();
 
-    expect(packageJsonContent.devDependencies).toBeDefined();
-    expect(packageJsonContent.devDependencies.typescript).toBeDefined();
-  });
-
-  it('should include Vite as a development dependency', () => {
-    expect(packageJsonContent.devDependencies).toBeDefined();
+    // Verify Vite development dependencies
     expect(packageJsonContent.devDependencies.vite).toBeDefined();
-  });
+    expect(packageJsonContent.devDependencies['@vitejs/plugin-react']).toBeDefined();
 
-  it('should include ESLint and related plugins as development dependencies', () => {
-    expect(packageJsonContent.devDependencies).toBeDefined();
+    // Verify TypeScript development dependencies
+    expect(packageJsonContent.devDependencies.typescript).toBeDefined();
+    expect(packageJsonContent.devDependencies['@types/react']).toBeDefined();
+    expect(packageJsonContent.devDependencies['@types/react-dom']).toBeDefined();
+
+    // Verify ESLint development dependencies
     expect(packageJsonContent.devDependencies.eslint).toBeDefined();
-    // Common ESLint configs for React + TypeScript Vite projects
     expect(packageJsonContent.devDependencies['@typescript-eslint/eslint-plugin']).toBeDefined();
     expect(packageJsonContent.devDependencies['@typescript-eslint/parser']).toBeDefined();
     expect(packageJsonContent.devDependencies['eslint-plugin-react-hooks']).toBeDefined();
     expect(packageJsonContent.devDependencies['eslint-plugin-react-refresh']).toBeDefined();
-  });
 
-  it('should define core scripts for development, build, preview, and linting', () => {
-    expect(packageJsonContent.scripts).toBeDefined();
+    // Verify standard Vite and ESLint scripts
     expect(packageJsonContent.scripts.dev).toBeDefined();
     expect(packageJsonContent.scripts.build).toBeDefined();
-    expect(packageJsonContent.scripts.preview).toBeDefined();
     expect(packageJsonContent.scripts.lint).toBeDefined();
+    expect(packageJsonContent.scripts.preview).toBeDefined();
+
+    // Verify the lint script command content
+    expect(packageJsonContent.scripts.lint).toMatch(/eslint/);
+    expect(packageJsonContent.scripts.lint).toMatch(/ts,tsx/);
+    expect(packageJsonContent.scripts.lint).toMatch(/--report-unused-disable-directives/);
+    expect(packageJsonContent.scripts.lint).toMatch(/--max-warnings 0/);
   });
 });
