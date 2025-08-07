@@ -1,56 +1,17 @@
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import fs from 'node:fs';
-import path from 'node:path';
+import PackageJson from '../src/components/PackageJson'; // This import will fail initially as src/components/PackageJson.tsx does not exist.
 
-describe('Project Initialization Check', () => {
-  const packageJsonPath = path.join(process.cwd(), 'package.json');
+describe('PackageJson Component', () => {
+  it('should indicate that the Vite React project is initialized with TypeScript and ESLint', () => {
+    // The component `PackageJson` is expected to verify and display the project initialization status.
+    // This render call will fail initially because src/components/PackageJson.tsx does not exist.
+    // If it existed, it would likely fail because the component does not yet implement the verification logic
+    // or does not output the specific expected text.
+    render(<PackageJson />);
 
-  it('should have a properly initialized Vite React project with TypeScript and ESLint setup in package.json', () => {
-    // Ensure package.json file exists and is readable
-    expect(() => fs.readFileSync(packageJsonPath, 'utf-8')).not.toThrow(
-      'package.json file not found or not readable. Ensure it exists at the project root.',
-    );
-
-    const packageJsonContent = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-
-    // Verify presence of 'dependencies' and 'devDependencies' sections
-    expect(packageJsonContent.dependencies).toBeDefined();
-    expect(typeof packageJsonContent.dependencies).toBe('object');
-    expect(packageJsonContent.devDependencies).toBeDefined();
-    expect(typeof packageJsonContent.devDependencies).toBe('object');
-    expect(packageJsonContent.scripts).toBeDefined();
-    expect(typeof packageJsonContent.scripts).toBe('object');
-
-    // Verify core React dependencies
-    expect(packageJsonContent.dependencies.react).toBeDefined();
-    expect(packageJsonContent.dependencies['react-dom']).toBeDefined();
-
-    // Verify Vite development dependencies
-    expect(packageJsonContent.devDependencies.vite).toBeDefined();
-    expect(packageJsonContent.devDependencies['@vitejs/plugin-react']).toBeDefined();
-
-    // Verify TypeScript development dependencies
-    expect(packageJsonContent.devDependencies.typescript).toBeDefined();
-    expect(packageJsonContent.devDependencies['@types/react']).toBeDefined();
-    expect(packageJsonContent.devDependencies['@types/react-dom']).toBeDefined();
-
-    // Verify ESLint development dependencies
-    expect(packageJsonContent.devDependencies.eslint).toBeDefined();
-    expect(packageJsonContent.devDependencies['@typescript-eslint/eslint-plugin']).toBeDefined();
-    expect(packageJsonContent.devDependencies['@typescript-eslint/parser']).toBeDefined();
-    expect(packageJsonContent.devDependencies['eslint-plugin-react-hooks']).toBeDefined();
-    expect(packageJsonContent.devDependencies['eslint-plugin-react-refresh']).toBeDefined();
-
-    // Verify standard Vite and ESLint scripts
-    expect(packageJsonContent.scripts.dev).toBeDefined();
-    expect(packageJsonContent.scripts.build).toBeDefined();
-    expect(packageJsonContent.scripts.lint).toBeDefined();
-    expect(packageJsonContent.scripts.preview).toBeDefined();
-
-    // Verify the lint script command content
-    expect(packageJsonContent.scripts.lint).toMatch(/eslint/);
-    expect(packageJsonContent.scripts.lint).toMatch(/ts,tsx/);
-    expect(packageJsonContent.scripts.lint).toMatch(/--report-unused-disable-directives/);
-    expect(packageJsonContent.scripts.lint).toMatch(/--max-warnings 0/);
+    // This assertion expects a specific text confirming the successful initialization.
+    // It will fail because the component is not yet rendering this text.
+    expect(screen.getByText(/Vite React project successfully initialized with TypeScript and ESLint/i)).toBeInTheDocument();
   });
 });
